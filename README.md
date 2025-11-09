@@ -5,27 +5,35 @@ A production-ready Next.js 14+ eCommerce platform for selling premium hoodies, o
 ## 🚀 Features
 
 ### Customer Features
-- Homepage with hero section and featured collections (Classic / Custom / Gen-Z)
-- Product catalog with category filtering
-- Product detail pages with variants and image gallery
+- Homepage with hero section, featured products, and collections (Classic / Custom / Gen-Z)
+- Product catalog with category filtering and search
+- Product detail pages with variants, image gallery, and reviews
 - Shopping cart with persistent storage
+- Wishlist for saving products (requires login)
+- Product reviews and ratings (with dummy reviews)
+- Coupon code support at checkout
 - Manual checkout (COD or Pre-booking)
 - User authentication (register/login)
+- Guest checkout (no forced login)
 - User account with order history
-- **WhatsApp Support**: Direct contact buttons throughout the site
+- Help & Support page with FAQs
+- **WhatsApp Support**: Direct contact buttons and floating button throughout the site
 
 ### Admin Features
 - Dashboard with sales overview and analytics
 - Product management (CRUD operations) with Cloudinary image upload
 - Order management with status updates
 - Customer management with order history
+- Promotions management for creating and managing coupon codes
 - Analytics: Total orders, total revenue, pending orders
 - Protected admin panel (role-based access)
+- Admin login at `/admin/login`
 
 **Admin Access:**
-- URL: `/admin` (redirects to `/admin/dashboard`)
+- URL: `/admin` (redirects to `/admin/login`)
+- Login URL: `/admin/login`
 - Default Credentials:
-  - Email: `admin@zerolimitapparel.com`
+  - Email: `admin@zerolimit.com`
   - Password: `shahzaib12`
 - After login, admin users can access the admin panel via the header navigation
 
