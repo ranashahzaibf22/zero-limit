@@ -23,10 +23,18 @@ export default function AdminLayout({
   React.useEffect(() => {
     if (status === 'loading') return;
     
+    // Skip redirect for login page
+    if (pathname === '/admin/login') return;
+    
     if (!session || (session.user as any)?.role !== 'admin') {
-      router.push('/auth/signin');
+      router.push('/admin/login');
     }
-  }, [session, status, router]);
+  }, [session, status, router, pathname]);
+
+  // Don't show layout on login page
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
 
   if (status === 'loading') {
     return (
@@ -45,6 +53,7 @@ export default function AdminLayout({
     { href: '/admin/products', label: 'Products' },
     { href: '/admin/orders', label: 'Orders' },
     { href: '/admin/customers', label: 'Customers' },
+    { href: '/admin/promotions', label: 'Promotions' },
   ];
 
   const handleSignOut = async () => {

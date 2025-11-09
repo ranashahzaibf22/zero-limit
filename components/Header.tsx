@@ -27,8 +27,14 @@ export function Header() {
             <Link href="/products" className="hover:underline">
               Shop
             </Link>
-            <Link href="/products?category=Hoodies" className="hover:underline">
-              Hoodies
+            <Link href="/products?category=Classic" className="hover:underline">
+              Classic
+            </Link>
+            <Link href="/products?category=Custom" className="hover:underline">
+              Custom
+            </Link>
+            <Link href="/products?category=Gen-Z" className="hover:underline">
+              Gen-Z
             </Link>
             <Link href="/about" className="hover:underline">
               About
@@ -39,6 +45,9 @@ export function Header() {
           <div className="flex items-center space-x-4">
             {session ? (
               <>
+                <Link href="/wishlist" className="hover:underline hidden md:block">
+                  Wishlist
+                </Link>
                 <Link href="/account" className="hover:underline">
                   Account
                 </Link>
@@ -59,7 +68,7 @@ export function Header() {
                 <Link href="/auth/signin" className="hover:underline">
                   Sign In
                 </Link>
-                <Link href="/auth/signup" className="hover:underline">
+                <Link href="/auth/signup" className="hover:underline hidden md:inline">
                   Sign Up
                 </Link>
               </>
@@ -94,8 +103,14 @@ export function Header() {
           <Link href="/products" className="hover:underline">
             Shop
           </Link>
-          <Link href="/products?category=Hoodies" className="hover:underline">
-            Hoodies
+          <Link href="/products?category=Classic" className="hover:underline">
+            Classic
+          </Link>
+          <Link href="/products?category=Custom" className="hover:underline">
+            Custom
+          </Link>
+          <Link href="/products?category=Gen-Z" className="hover:underline">
+            Gen-Z
           </Link>
           <Link href="/about" className="hover:underline">
             About
