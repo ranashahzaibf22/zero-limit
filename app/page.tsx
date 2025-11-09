@@ -3,11 +3,45 @@
  * Features hero section, featured products, and collections
  */
 
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/Button';
+import { ProductCard } from '@/components/ProductCard';
+import { Product } from '@/types';
+import { useCartStore } from '@/lib/cart-store';
+import toast from 'react-hot-toast';
 
 export default function HomePage() {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const addItem = useCartStore((state) => state.addItem);
+
+  useEffect(() => {
+    fetchFeaturedProducts();
+  }, []);
+
+  const fetchFeaturedProducts = async () => {
+    try {
+      const response = await fetch('/api/products?limit=6');
+      const data = await response.json();
+      
+      if (data.success) {
+        setFeaturedProducts(data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddToCart = (product: Product) => {
+    addItem(product);
+    toast.success(`${product.name} added to cart!`);
+  };
   return (
     <div>
       {/* Hero Section */}
@@ -45,6 +79,41 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold mb-4">Featured Products</h2>
+          <p className="text-gray-600 text-lg">
+            Check out our latest and most popular hoodies
+          </p>
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {featuredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                />
+              ))}
+            </div>
+            <div className="text-center">
+              <Link href="/products">
+                <Button variant="outline" size="lg">
+                  View All Products →
+                </Button>
+              </Link>
+            </div>
+          </>
+        )}
       </section>
 
       {/* Featured Collections */}

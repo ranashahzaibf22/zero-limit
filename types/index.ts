@@ -127,3 +127,34 @@ export interface ProductFormData {
   images: string[];
   variants?: Omit<ProductVariant, 'id' | 'product_id'>[];
 }
+
+export interface ProductReview {
+  id: string;
+  product_id: string;
+  user_id: string;
+  rating: number; // 1-5
+  comment: string;
+  created_at: Date;
+  user?: User;
+}
+
+export interface WishlistItem {
+  id: string;
+  user_id: string;
+  product_id: string;
+  created_at: Date;
+  product?: Product;
+}
+
+export interface Promotion {
+  id: string;
+  code: string;
+  discount_type: 'percent' | 'fixed';
+  amount: number;
+  expiry?: Date;
+  usage_limit?: number;
+  usage_count: number;
+  active: boolean;
+  created_at: Date;
+  updated_at?: Date;
+}

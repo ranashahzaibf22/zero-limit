@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 function ProductsContent() {
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
+  const search = searchParams.get('search');
   
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,15 +25,19 @@ function ProductsContent() {
 
   useEffect(() => {
     fetchProducts();
-  }, [category]);
+  }, [category, search]);
 
   const fetchProducts = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const url = category 
-        ? `/api/products?category=${encodeURIComponent(category)}`
+      const params = new URLSearchParams();
+      if (category) params.append('category', category);
+      if (search) params.append('search', search);
+      
+      const url = params.toString() 
+        ? `/api/products?${params.toString()}`
         : '/api/products';
       
       const response = await fetch(url);
@@ -60,10 +65,13 @@ function ProductsContent() {
       {/* Header */}
       <div className="mb-12">
         <h1 className="text-4xl font-bold mb-4">
-          {category ? `${category}` : 'All Products'}
+          {search ? `Search Results for "${search}"` : category ? `${category}` : 'All Products'}
         </h1>
         <p className="text-gray-600">
-          Discover our collection of premium quality hoodies
+          {search 
+            ? `Found ${products.length} ${products.length === 1 ? 'product' : 'products'}`
+            : 'Discover our collection of premium quality hoodies'
+          }
         </p>
       </div>
 
