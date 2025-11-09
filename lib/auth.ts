@@ -1,6 +1,9 @@
 /**
  * NextAuth configuration for authentication
  * Handles user login, registration, and session management
+ * 
+ * Uses Credentials provider with Supabase for user storage
+ * Password verification done with bcrypt
  */
 
 import { NextAuthOptions } from 'next-auth';
@@ -17,11 +20,12 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        // Validate credentials exist
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Invalid credentials');
         }
 
-        // Query user from database
+        // Query user from Supabase database
         const { data: user, error } = await supabaseAdmin
           .from('users')
           .select('*')
@@ -32,7 +36,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid email or password');
         }
 
-        // Verify password
+        // Verify password hash using bcrypt
         const isValidPassword = await bcrypt.compare(
           credentials.password,
           user.password_hash
@@ -42,6 +46,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid email or password');
         }
 
+        // Return user object for session
         return {
           id: user.id,
           email: user.email,
@@ -52,6 +57,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    // Add user info to JWT token
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -59,6 +65,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
+    // Add user info to session (available client-side)
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
@@ -81,20 +88,22 @@ export const authOptions: NextAuthOptions = {
 
 /**
  * Register a new user
+ * Creates a new user account with hashed password
+ * 
  * @param name - User's full name
- * @param email - User's email address
- * @param password - User's password (will be hashed)
- * @returns User object or error
+ * @param email - User's email address (must be unique)
+ * @param password - User's password (will be hashed with bcrypt)
+ * @returns User object or throws error
  */
 export async function registerUser(
   name: string,
   email: string,
   password: string
 ) {
-  // Hash password
+  // Hash password using bcrypt (10 rounds)
   const password_hash = await bcrypt.hash(password, 10);
 
-  // Insert user into database
+  // Insert user into Supabase database
   const { data, error } = await supabaseAdmin
     .from('users')
     .insert([
@@ -102,13 +111,14 @@ export async function registerUser(
         name,
         email,
         password_hash,
-        role: 'user',
+        role: 'user', // Default role is 'user', can be upgraded to 'admin' in database
       },
     ])
     .select()
     .single();
 
   if (error) {
+    // Check for duplicate email (PostgreSQL unique constraint error)
     if (error.code === '23505') {
       throw new Error('Email already exists');
     }
