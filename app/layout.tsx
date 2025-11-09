@@ -1,0 +1,45 @@
+/**
+ * Root layout for ZeroLimitApparel
+ * Includes session provider, toast notifications, and global styles
+ */
+
+import type { Metadata } from "next";
+import "./globals.css";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { FloatingWhatsAppButton } from "@/components/WhatsAppButton";
+import { Providers } from "./providers";
+import { Toaster } from "react-hot-toast";
+
+export const metadata: Metadata = {
+  title: "ZeroLimitApparel - Premium Hoodies",
+  description: "Shop premium quality hoodies with minimalist design. Break your limits with ZeroLimitApparel.",
+  keywords: ["hoodies", "streetwear", "fashion", "minimalist", "premium"],
+  openGraph: {
+    title: "ZeroLimitApparel - Premium Hoodies",
+    description: "Shop premium quality hoodies with minimalist design.",
+    type: "website",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className="antialiased bg-white text-black min-h-screen flex flex-col font-sans">
+        <Providers>
+          <Header />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+          <FloatingWhatsAppButton />
+          <Toaster position="bottom-right" />
+        </Providers>
+      </body>
+    </html>
+  );
+}
