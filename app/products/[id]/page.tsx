@@ -33,18 +33,13 @@ export default function ProductDetailPage() {
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
-  const [isInWishlist, setIsInWishlist] = useState(false);
-  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
   
   const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
     fetchProduct();
     fetchReviews();
-    if (session) {
-      checkWishlistStatus();
-    }
-  }, [productId, session]);
+  }, [productId]);
 
   const fetchProduct = async () => {
     setIsLoading(true);
@@ -81,62 +76,6 @@ export default function ProductDetailPage() {
 
     addItem(product, selectedVariant, quantity);
     toast.success(`${product.name} added to cart!`);
-  };
-
-  const checkWishlistStatus = async () => {
-    try {
-      const response = await fetch('/api/wishlist');
-      const result = await response.json();
-      
-      if (result.success) {
-        const inWishlist = result.data.some((item: any) => item.product_id === productId);
-        setIsInWishlist(inWishlist);
-      }
-    } catch (error) {
-      console.error('Error checking wishlist:', error);
-    }
-  };
-
-  const toggleWishlist = async () => {
-    if (!session) {
-      toast.error('Please sign in to save for later');
-      router.push('/auth/signin');
-      return;
-    }
-
-    setIsTogglingWishlist(true);
-    try {
-      if (isInWishlist) {
-        const response = await fetch(`/api/wishlist?product_id=${productId}`, {
-          method: 'DELETE',
-        });
-        const result = await response.json();
-        
-        if (result.success) {
-          setIsInWishlist(false);
-          toast.success('Removed from wishlist');
-        }
-      } else {
-        const response = await fetch('/api/wishlist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ product_id: productId }),
-        });
-        const result = await response.json();
-        
-        if (result.success) {
-          setIsInWishlist(true);
-          toast.success('Saved for later!');
-        } else {
-          toast.error(result.error || 'Failed to save for later');
-        }
-      }
-    } catch (error) {
-      console.error('Error toggling wishlist:', error);
-      toast.error('Failed to update wishlist');
-    } finally {
-      setIsTogglingWishlist(false);
-    }
   };
 
   const fetchReviews = async () => {
@@ -212,12 +151,9 @@ export default function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex justify-center items-center">
-        <div className="relative">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-neutral-200 border-t-emerald-600"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 bg-emerald-600 rounded-full animate-ping opacity-20"></div>
-          </div>
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
         </div>
       </div>
     );
@@ -225,15 +161,11 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="text-center bg-white p-12 rounded-2xl shadow-lg max-w-md">
-          <svg className="w-24 h-24 mx-auto text-neutral-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          <h1 className="text-2xl font-bold mb-4 text-neutral-900">Product Not Found</h1>
-          <p className="text-neutral-600 mb-6">The product you&apos;re looking for doesn&apos;t exist.</p>
-          <Button onClick={() => router.push('/products')} className="bg-emerald-600 hover:bg-emerald-700">
-            Browse Products
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Product not found</h1>
+          <Button onClick={() => router.push('/products')}>
+            Back to Products
           </Button>
         </div>
       </div>
@@ -249,97 +181,80 @@ export default function ProductDetailPage() {
   const currentStock = selectedVariant?.stock || product.stock;
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-12">
-      <div className="container mx-auto px-4 lg:px-8">
-        {/* Breadcrumb */}
-        <nav className="mb-8 flex items-center space-x-2 text-sm text-neutral-600">
-          <Link href="/" className="hover:text-emerald-600">Home</Link>
-          <span>/</span>
-          <Link href="/products" className="hover:text-emerald-600">Products</Link>
-          <span>/</span>
-          <span className="text-neutral-900 font-medium">{product.name}</span>
-        </nav>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Images */}
-          <div className="p-8">
-            <div className="aspect-square relative bg-neutral-100 mb-6 rounded-xl overflow-hidden">
-              <Image
-                src={images[selectedImage]?.image_url || primaryImage}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
+    <div className="container mx-auto px-4 py-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        {/* Images */}
+        <div>
+          <div className="aspect-square relative bg-gray-100 mb-4">
+            <Image
+              src={images[selectedImage]?.image_url || primaryImage}
+              alt={product.name}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+          
+          {/* Image Thumbnails */}
+          {images.length > 1 && (
+            <div className="grid grid-cols-4 gap-4">
+              {images.map((image, index) => (
+                <button
+                  key={image.id}
+                  onClick={() => setSelectedImage(index)}
+                  className={`aspect-square relative bg-gray-100 border-2 transition-colors ${
+                    selectedImage === index ? 'border-black' : 'border-gray-200'
+                  }`}
+                >
+                  <Image
+                    src={image.image_url}
+                    alt={`${product.name} ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
             </div>
-            
-            {/* Image Thumbnails */}
-            {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-4">
-                {images.map((image, index) => (
-                  <button
-                    key={image.id}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-square relative bg-neutral-100 border-2 rounded-lg overflow-hidden transition-all ${
-                      selectedImage === index ? 'border-emerald-600 shadow-lg scale-105' : 'border-neutral-200 hover:border-emerald-400'
-                    }`}
-                  >
-                    <Image
-                      src={image.image_url}
-                      alt={`${product.name} ${index + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
+          )}
+        </div>
+
+        {/* Product Info */}
+        <div>
+          <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
+          
+          {/* Rating Display */}
+          {totalReviews > 0 && (
+            <div className="flex items-center mb-4">
+              {renderStars(Math.round(averageRating), 'sm')}
+              <span className="ml-2 text-sm text-gray-600">
+                {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})
+              </span>
+            </div>
+          )}
+          
+          <div className="text-3xl font-bold mb-6">
+            ${currentPrice.toFixed(2)}
           </div>
 
-          {/* Product Info */}
-          <div className="p-8 lg:p-12">
-            {/* Category Badge */}
-            {product.category && (
-              <div className="inline-block mb-4 px-4 py-2 bg-emerald-100 rounded-full">
-                <span className="text-emerald-700 text-sm font-semibold uppercase tracking-wide">{product.category}</span>
-              </div>
-            )}
+          <p className="text-gray-700 mb-6 leading-relaxed">
+            {product.description}
+          </p>
 
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-neutral-900">{product.name}</h1>
-            
-            {/* Rating Display */}
-            {totalReviews > 0 && (
-              <div className="flex items-center mb-6">
-                {renderStars(Math.round(averageRating), 'sm')}
-                <span className="ml-3 text-sm text-neutral-600 font-medium">
-                  {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})
-                </span>
-              </div>
-            )}
-            
-            <div className="text-4xl font-bold mb-8 text-neutral-900">
-              ${currentPrice.toFixed(2)}
-            </div>
-
-            <p className="text-neutral-700 mb-8 leading-relaxed text-lg">
-              {product.description}
-            </p>
-
-            {/* Variants */}
-            {product.variants && product.variants.length > 0 && (
-              <div className="mb-8">
-                <label className="block font-bold mb-4 text-neutral-900">Select Size/Color</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {product.variants.map((variant) => (
-                    <button
-                      key={variant.id}
-                      onClick={() => setSelectedVariant(variant)}
-                      className={`px-4 py-3 border-2 rounded-lg font-semibold transition-all ${
-                        selectedVariant?.id === variant.id
-                          ? 'border-emerald-600 bg-emerald-600 text-white shadow-lg'
-                          : 'border-neutral-300 text-neutral-700 hover:border-emerald-600'
-                      }`}
-                    >
+          {/* Variants */}
+          {product.variants && product.variants.length > 0 && (
+            <div className="mb-6">
+              <label className="block font-medium mb-3">Select Size/Color</label>
+              <div className="grid grid-cols-3 gap-3">
+                {product.variants.map((variant) => (
+                  <button
+                    key={variant.id}
+                    onClick={() => setSelectedVariant(variant)}
+                    className={`px-4 py-2 border-2 transition-colors ${
+                      selectedVariant?.id === variant.id
+                        ? 'border-black bg-black text-white'
+                        : 'border-gray-300 hover:border-black'
+                    }`}
+                  >
                     {variant.variant_name}
                   </button>
                 ))}
@@ -348,19 +263,19 @@ export default function ProductDetailPage() {
           )}
 
           {/* Quantity */}
-          <div className="mb-8">
-            <label className="block font-bold mb-4 text-neutral-900">Quantity</label>
+          <div className="mb-6">
+            <label className="block font-medium mb-3">Quantity</label>
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-12 h-12 border-2 border-neutral-300 rounded-lg hover:border-emerald-600 hover:bg-emerald-50 transition-all font-bold text-neutral-700"
+                className="w-10 h-10 border border-gray-300 hover:border-black transition-colors"
               >
                 -
               </button>
-              <span className="text-2xl font-bold w-16 text-center text-neutral-900">{quantity}</span>
+              <span className="text-xl font-medium w-12 text-center">{quantity}</span>
               <button
                 onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
-                className="w-12 h-12 border-2 border-neutral-300 rounded-lg hover:border-emerald-600 hover:bg-emerald-50 transition-all font-bold text-neutral-700"
+                className="w-10 h-10 border border-gray-300 hover:border-black transition-colors"
               >
                 +
               </button>
@@ -368,75 +283,42 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Stock Status */}
-          <div className="mb-8">
+          <div className="mb-6">
             {currentStock > 0 ? (
-              <div className="flex items-center text-emerald-600 bg-emerald-50 px-4 py-3 rounded-lg">
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <p className="font-semibold">In Stock ({currentStock} available)</p>
-              </div>
+              <p className="text-green-600">In Stock ({currentStock} available)</p>
             ) : (
-              <div className="flex items-center text-red-600 bg-red-50 px-4 py-3 rounded-lg">
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <p className="font-semibold">Out of Stock</p>
-              </div>
+              <p className="text-red-600 font-medium">Out of Stock</p>
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-4 mb-8">
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all"
-              onClick={handleAddToCart}
-              disabled={currentStock === 0}
-            >
-              {currentStock > 0 ? (
-                <span className="flex items-center justify-center">
-                  <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  Add to Cart
-                </span>
-              ) : 'Out of Stock'}
-            </Button>
+          {/* Add to Cart Button */}
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full mb-4"
+            onClick={handleAddToCart}
+            disabled={currentStock === 0}
+          >
+            {currentStock > 0 ? 'Add to Cart' : 'Out of Stock'}
+          </Button>
 
-            {/* Save for Later Button */}
-            <button
-              onClick={toggleWishlist}
-              disabled={isTogglingWishlist}
-              className={`w-full py-4 px-6 border-2 rounded-xl font-bold transition-all flex items-center justify-center ${
-                isInWishlist 
-                  ? 'border-red-500 bg-red-50 text-red-600 hover:bg-red-100'
-                  : 'border-neutral-300 text-neutral-700 hover:border-emerald-600 hover:bg-emerald-50'
-              }`}
-            >
-              <svg 
-                className={`w-6 h-6 mr-2 ${isInWishlist ? 'fill-current' : ''}`} 
-                fill={isInWishlist ? 'currentColor' : 'none'}
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              {isInWishlist ? 'Saved for Later' : 'Save for Later'}
-            </button>
-
-            {/* WhatsApp Contact */}
+          {/* WhatsApp Contact */}
+          <div className="mb-4">
             <WhatsAppButton 
               message={`Hi, I'm interested in ${product.name}`}
-              className="w-full py-4 px-6 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-all flex items-center justify-center shadow-md hover:shadow-lg"
-            >
-              <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-              </svg>
-              Buy Now on WhatsApp
-            </WhatsAppButton>
+              className="w-full"
+            />
           </div>
+
+          {/* Category */}
+          {product.category && (
+            <div className="pt-6 border-t border-gray-200">
+              <p className="text-sm text-gray-600">
+                Category:{' '}
+                <span className="font-medium text-black">{product.category}</span>
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
