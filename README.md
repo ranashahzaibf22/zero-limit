@@ -1,264 +1,138 @@
-# ZeroLimitApparel - Full-Featured eCommerce Store
+# ZeroLimitApparel - eCommerce Store (Free Tier Only)
 
-A production-ready Next.js 14+ eCommerce platform for selling premium hoodies with a minimalist black/white theme.
+A production-ready Next.js 14+ eCommerce platform for selling premium hoodies, optimized to run on free-tier services only.
 
 ## 🚀 Features
 
 ### Customer Features
-- **Homepage**: Hero section, featured collections, brand story
-- **Product Catalog**: Grid layout with filtering by category
-- **Product Details**: Image gallery, size/color variants, stock info
-- **Shopping Cart**: Add/remove items, update quantities
-- **Checkout**: Secure Stripe payment integration
-- **User Authentication**: Register/login with NextAuth.js
-- **Order History**: View past orders and status
+- Homepage with hero section and featured collections
+- Product catalog with category filtering
+- Product detail pages with variants and image gallery
+- Shopping cart with persistent storage
+- Manual checkout (COD or Pre-booking)
+- User authentication (register/login)
+- User account with order history
+- **WhatsApp Support**: Direct contact buttons throughout the site
 
 ### Admin Features
-- **Dashboard**: Sales overview, order statistics
-- **Product Management**: CRUD operations for products
-- **Order Management**: Update order status, view details
-- **Customer Management**: View all customers and their info
+- Dashboard with sales overview
+- Product management (CRUD operations)
+- Order management with status updates
+- Customer management
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack (100% Free Tier)
 
 - **Frontend**: Next.js 14+ with App Router, TypeScript, Tailwind CSS
-- **Backend**: Supabase/Neon PostgreSQL
-- **Authentication**: NextAuth.js with credentials provider
-- **Payments**: Stripe with webhook support
-- **State Management**: Zustand for cart
-- **Image Storage**: Supabase Storage
-- **Deployment**: Vercel & Digital Ocean ready
+- **Backend**: Supabase PostgreSQL (Free Tier - up to 500MB)
+- **Authentication**: NextAuth.js
+- **Payments**: Manual (COD / Pre-booking)
+- **Image Hosting**: Cloudinary (Free Tier - 25GB storage, 25GB bandwidth/month)
+- **State**: Zustand for cart
+- **Deployment**: Vercel (Free Tier)
 
-## 📋 Prerequisites
+## 📋 Quick Start
 
-- Node.js 18+ and npm
-- Supabase or Neon account (PostgreSQL database)
-- Stripe account
-- Git
-
-## 🔧 Installation & Setup
-
-### 1. Clone the Repository
+### 1. Install
 
 ```bash
-git clone <repository-url>
-cd zero-limit
 npm install
 ```
 
-### 2. Database Setup
+### 2. Set up Supabase (Free)
 
-#### Option A: Supabase
+1. Create account at [supabase.com](https://supabase.com)
+2. Create new project
+3. Run SQL from `lib/db-schema.ts` in SQL Editor
+4. Get credentials from Settings > API
 
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to SQL Editor and run the schema from `lib/db-schema.ts`
-3. Create a storage bucket named `products` for product images
-4. Get your project URL and keys from Settings > API
+### 3. Set up Cloudinary (Free)
 
-#### Option B: Neon
+1. Create account at [cloudinary.com](https://cloudinary.com)
+2. Get Cloud Name, API Key, API Secret from Dashboard
+3. Create upload preset (Settings > Upload > Add preset)
 
-1. Create a new project at [neon.tech](https://neon.tech)
-2. Connect to your database and run the schema from `lib/db-schema.ts`
-3. Get your connection string from the dashboard
-
-### 3. Environment Variables
-
-Copy `.env.example` to `.env.local`:
+### 4. Configure Environment
 
 ```bash
 cp .env.example .env.local
 ```
 
-Fill in your environment variables:
-
+Edit `.env.local`:
 ```env
-# Database (Supabase)
-DATABASE_URL=your_postgresql_connection_string
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-
-# NextAuth
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=generate_with_openssl_rand_base64_32
-
-# Stripe
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-
-# App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NODE_ENV=development
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_key
+NEXTAUTH_SECRET=$(openssl rand -base64 32)
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+NEXT_PUBLIC_WHATSAPP_NUMBER=+92XXXXXXXXXX
 ```
 
-#### Generate NextAuth Secret
-
-```bash
-openssl rand -base64 32
-```
-
-### 4. Stripe Setup
-
-1. Create account at [stripe.com](https://stripe.com)
-2. Get API keys from Developers > API keys
-3. Set up webhook endpoint:
-   - Go to Developers > Webhooks
-   - Add endpoint: `https://yourdomain.com/api/webhooks/stripe`
-   - Select events: `payment_intent.succeeded`, `payment_intent.payment_failed`
-   - Copy webhook signing secret to `STRIPE_WEBHOOK_SECRET`
-
-### 5. Create Admin User
-
-Run this SQL in your database to create an admin user:
-
-```sql
-INSERT INTO users (name, email, password_hash, role)
-VALUES (
-  'Admin',
-  'admin@zerolimitapparel.com',
-  '$2a$10$...',  -- Use bcrypt to hash 'password123' or your chosen password
-  'admin'
-);
-```
-
-Or register normally and update the role:
-
-```sql
-UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
-```
-
-### 6. Run Development Server
+### 5. Run
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Visit http://localhost:3000
 
-## 📁 Project Structure
+## 💳 Payment Methods
 
-```
-zerolimitapparel/
-├── app/                    # Next.js App Router pages
-│   ├── api/               # API routes
-│   │   ├── auth/         # NextAuth endpoints
-│   │   ├── checkout/     # Stripe checkout
-│   │   ├── products/     # Products API
-│   │   ├── register/     # User registration
-│   │   └── webhooks/     # Stripe webhooks
-│   ├── admin/            # Admin panel pages
-│   ├── auth/             # Authentication pages
-│   ├── products/         # Product pages
-│   ├── cart/             # Shopping cart
-│   ├── checkout/         # Checkout flow
-│   └── account/          # User account
-├── components/            # Reusable UI components
-├── lib/                   # Utilities and configurations
-│   ├── auth.ts           # NextAuth configuration
-│   ├── stripe.ts         # Stripe integration
-│   ├── supabase.ts       # Supabase client
-│   ├── cart-store.ts     # Cart state management
-│   └── db-schema.ts      # Database schema
-├── types/                 # TypeScript type definitions
-├── public/                # Static assets
-└── docs/                  # Documentation
-```
+### Cash on Delivery (COD)
+Customer pays when receiving the order.
 
-## 🎨 Customization
+### Pre-booking
+Store collects customer contact number and reaches out for payment via WhatsApp.
 
-### Brand Colors
+## 📱 WhatsApp Integration
 
-Edit `tailwind.config.js` to customize colors.
+WhatsApp buttons appear on:
+- All product pages
+- Checkout page
+- Floating button (bottom-right on all pages)
 
-### Product Categories
+Configure with `NEXT_PUBLIC_WHATSAPP_NUMBER` in `.env.local`
 
-Add/modify categories in the admin panel or directly in the database.
+## 🚢 Deploy to Vercel (Free)
 
-### Shipping Costs
-
-Edit shipping logic in `app/cart/page.tsx` and `app/checkout/page.tsx`.
-
-## 🚢 Deployment
-
-### Deploy to Vercel
-
-1. Push your code to GitHub
-2. Import project on [vercel.com](https://vercel.com)
+1. Push to GitHub
+2. Import on [vercel.com](https://vercel.com)
 3. Add environment variables
 4. Deploy!
 
-```bash
-npm install -g vercel
-vercel
-```
-
-### Deploy to Digital Ocean
-
-1. Create a Droplet (Ubuntu 22.04)
-2. Install Node.js and npm
-3. Clone repository
-4. Install dependencies: `npm install`
-5. Build: `npm run build`
-6. Install PM2: `npm install -g pm2`
-7. Start: `pm2 start npm --name "zerolimit" -- start`
-8. Set up Nginx as reverse proxy
-9. Configure SSL with Let's Encrypt
-
-#### Nginx Configuration
-
-```nginx
-server {
-    listen 80;
-    server_name yourdomain.com;
-
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-## 🧪 Testing
-
-Run tests:
-
-```bash
-npm test
-```
+All services used (Supabase, Cloudinary, Vercel) have generous free tiers suitable for small to medium eCommerce stores.
 
 ## 📝 Database Schema
 
-See `lib/db-schema.ts` for complete schema. Main tables:
-
-- **users**: User accounts and authentication
+- **users**: Authentication and user data
 - **products**: Product catalog
-- **product_images**: Product photos
-- **product_variants**: Size/color variants
-- **orders**: Customer orders
-- **order_items**: Order line items
+- **product_images**: Cloudinary image URLs
+- **product_variants**: Size/color options
+- **orders**: Orders with `payment_type` (cod/prebooking) and `contact_number`
+- **order_items**: Line items
+
+See `lib/db-schema.ts` for complete schema.
+
+## 📚 Documentation
+
+- `README.md` - This file
+- `QUICKSTART.md` - Quick setup guide
+- `docs/DEPLOYMENT.md` - Deployment guide
+- `docs/PROJECT_SUMMARY.md` - Project overview
 
 ## 🔐 Security
 
-- Passwords hashed with bcrypt
-- API routes protected with authentication
-- Stripe webhook signature verification
-- Admin routes protected by role check
-- SQL injection prevention via Supabase client
-
-## 📞 Support
-
-For issues and questions, create an issue in the repository.
+- Password hashing with bcrypt
+- Session-based authentication
+- Admin role protection
+- SQL injection prevention
+- Environment variables for secrets
 
 ## 📄 License
 
-MIT License
+MIT
 
 ---
 
-Built with ❤️ for ZeroLimitApparel
-
+Built with ❤️ using 100% free-tier services

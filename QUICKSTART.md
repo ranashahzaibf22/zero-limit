@@ -1,117 +1,142 @@
-# Quick Start Guide - ZeroLimitApparel
+# Quick Start Guide - ZeroLimitApparel (Free Services Only)
 
-## ⚡ Getting Started in 5 Minutes
+## ⚡ Get Started in 10 Minutes
 
 ### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Set Up Database
+### 2. Set Up Supabase (Free Tier)
 
-**Option A: Supabase (Recommended)**
-1. Create account at [supabase.com](https://supabase.com)
-2. Create new project
-3. Go to SQL Editor
-4. Copy and run the schema from `lib/db-schema.ts`
-5. Create storage bucket: Go to Storage → Create bucket → Name it "products"
-6. Make bucket public (for images)
+**Create Account** at [supabase.com](https://supabase.com)
 
-**Option B: Neon**
-1. Create account at [neon.tech](https://neon.tech)
-2. Create new project
-3. Connect to SQL console
-4. Run schema from `lib/db-schema.ts`
+1. Create new project
+2. Go to SQL Editor
+3. Copy entire content from `lib/db-schema.ts`
+4. Paste and run in SQL Editor
+5. Go to Settings > API and copy:
+   - Project URL
+   - `anon` public key
+   - `service_role` secret key
 
-### 3. Configure Environment Variables
+### 3. Set Up Cloudinary (Free Tier)
+
+**Create Account** at [cloudinary.com](https://cloudinary.com)
+
+1. From Dashboard, copy:
+   - Cloud Name
+   - API Key
+   - API Secret
+2. (Optional) Create upload preset:
+   - Settings > Upload
+   - Add upload preset
+   - Set folder to `zerolimit/products`
+
+### 4. Configure Environment
+
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local` with your values:
+Edit `.env.local`:
 ```env
-# From Supabase: Settings > API
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+# Supabase (from step 2)
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_key
 
-# Generate with: openssl rand -base64 32
-NEXTAUTH_SECRET=your_generated_secret
-
-# From Stripe: Developers > API keys
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
-STRIPE_SECRET_KEY=sk_test_xxx
-
-# Leave as-is for local dev
+# Generate secret
+NEXTAUTH_SECRET=$(openssl rand -base64 32)
 NEXTAUTH_URL=http://localhost:3000
+
+# Cloudinary (from step 3)
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# WhatsApp Business number
+NEXT_PUBLIC_WHATSAPP_NUMBER=+92XXXXXXXXXX
+
+# App URL
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### 4. Run Development Server
+### 5. Create Admin User
+
+In Supabase SQL Editor:
+
+```sql
+-- Create admin user (password: admin123)
+INSERT INTO users (name, email, password_hash, role)
+VALUES (
+  'Admin User',
+  'admin@zerolimit.com',
+  '$2a$10$rXK0h3cHXlH8nWRXlKv7XeLhWx7Ej0CiGhPSk/KKH7KnqWJkz7Wj6',
+  'admin'
+);
+```
+
+> **Note**: This hash is for "admin123". For production, generate your own hash using bcrypt.
+
+Or create via signup and update role:
+
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
+```
+
+### 6. Run Development Server
+
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### 5. Create Admin User
-
-Run this in Supabase SQL Editor (or your database):
-```sql
--- First, generate password hash with bcrypt
--- For password "admin123", the hash would be:
-INSERT INTO users (name, email, password_hash, role)
-VALUES (
-  'Admin',
-  'admin@zerolimit.com',
-  -- Hash for "admin123" - replace with your own hashed password
-  '$2a$10$YourHashedPasswordHere',
-  'admin'
-);
-```
-
-Or register normally at `/auth/signup`, then update role:
-```sql
-UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
-```
-
-### 6. Add Sample Products (Optional)
-
-Run in SQL Editor:
-```sql
-INSERT INTO products (name, description, price, category, stock) VALUES
-  ('Classic Black Hoodie', 'Premium black hoodie', 59.99, 'Hoodies', 100),
-  ('Classic White Hoodie', 'Premium white hoodie', 59.99, 'Hoodies', 100);
-```
-
 ## 🎯 Quick Access
 
 - **Homepage**: http://localhost:3000
 - **Products**: http://localhost:3000/products
-- **Admin Panel**: http://localhost:3000/admin
+- **Admin**: http://localhost:3000/admin (login with admin credentials)
 - **Sign Up**: http://localhost:3000/auth/signup
 
-## 📝 Common Tasks
+## 📝 Add Sample Products
 
-### Add a Product (via Admin)
-1. Go to `/admin` and sign in
-2. Click "Products" → "Add Product"
-3. Fill in details and save
+In Supabase SQL Editor:
 
-### Test Checkout
-1. Add products to cart
-2. Go to `/cart`
-3. Click "Proceed to Checkout"
-4. Use Stripe test card: `4242 4242 4242 4242`
-5. Any future date, any CVC
+```sql
+-- Add sample products
+INSERT INTO products (name, description, price, category, stock) VALUES
+  ('Classic Black Hoodie', 'Premium black hoodie with ZeroLimit branding', 59.99, 'Hoodies', 100),
+  ('Classic White Hoodie', 'Premium white hoodie with ZeroLimit branding', 59.99, 'Hoodies', 100),
+  ('Oversized Black Hoodie', 'Trendy oversized fit black hoodie', 69.99, 'Hoodies', 75);
 
-### Set Up Stripe Webhooks (for Production)
-1. Stripe Dashboard → Developers → Webhooks
-2. Add endpoint: `https://yourdomain.com/api/webhooks/stripe`
-3. Select events: `payment_intent.succeeded`, `payment_intent.payment_failed`
-4. Copy signing secret to `STRIPE_WEBHOOK_SECRET`
+-- Add sample images (replace with your Cloudinary URLs)
+INSERT INTO product_images (product_id, image_url, is_primary) 
+SELECT id, 'https://res.cloudinary.com/demo/image/upload/sample.jpg', true
+FROM products LIMIT 1;
+```
 
-## 🚀 Deploy to Vercel
+## 🛍️ Test Checkout
+
+1. Browse products at http://localhost:3000/products
+2. Add items to cart
+3. Go to checkout
+4. Choose payment method:
+   - **COD**: Cash on Delivery
+   - **Pre-booking**: Provide phone number for payment confirmation
+5. Place order
+
+## 📱 WhatsApp Integration
+
+The WhatsApp button will appear:
+- On every product page
+- On checkout page
+- As floating button (bottom-right corner)
+
+Make sure `NEXT_PUBLIC_WHATSAPP_NUMBER` is set in `.env.local`
+
+## 🚀 Deploy to Vercel (Free)
 
 ```bash
 # Install Vercel CLI
@@ -119,40 +144,59 @@ npm i -g vercel
 
 # Deploy
 vercel
-
-# Add environment variables in Vercel dashboard
-# Settings > Environment Variables
 ```
+
+Or use Vercel Dashboard:
+1. Push code to GitHub
+2. Import project on [vercel.com](https://vercel.com)
+3. Add all environment variables
+4. Deploy!
 
 ## 🔧 Troubleshooting
 
-**Build fails?**
-```bash
-rm -rf .next node_modules
-npm install
-npm run build
-```
-
 **Database connection error?**
-- Check `NEXT_PUBLIC_SUPABASE_URL` is correct
-- Verify API keys are from the same project
-- Ensure schema is applied
+- Verify Supabase URL and keys
+- Check schema was applied successfully
 
-**Stripe not working?**
-- Confirm you're using test keys (start with `pk_test_` and `sk_test_`)
-- Check webhook secret matches
-- Test with card `4242 4242 4242 4242`
+**Images not uploading?**
+- Verify Cloudinary credentials
+- Check upload preset is created
 
-**Can't log in as admin?**
-- Verify user role is 'admin' in database
-- Clear browser cookies and try again
+**WhatsApp button not working?**
+- Ensure phone number includes country code
+- Format: +92XXXXXXXXXX (no spaces)
+
+**Can't login as admin?**
+- Check password hash is correct
+- Verify role is 'admin' in database
+
+## 💡 Next Steps
+
+1. Replace placeholder images with actual product photos
+2. Upload images to Cloudinary
+3. Update product database with Cloudinary URLs
+4. Customize brand colors in Tailwind config
+5. Add your products in admin panel
+6. Test complete order flow
+7. Deploy to Vercel
 
 ## 📚 More Information
 
-- Full documentation: See `README.md`
-- Deployment guide: See `docs/DEPLOYMENT.md`
-- Project summary: See `docs/PROJECT_SUMMARY.md`
+- Full docs: `README.md`
+- Deployment: `docs/DEPLOYMENT.md`
+- Project summary: `docs/PROJECT_SUMMARY.md`
 
-## 🎉 You're Ready!
+## 💰 Cost Breakdown
 
-Your eCommerce store is now running. Start customizing and add your products!
+All services are **100% FREE** for small stores:
+
+- **Supabase**: 500MB database, 1GB file storage, 2GB bandwidth/month
+- **Cloudinary**: 25GB storage, 25GB bandwidth/month, 25k transformations/month
+- **Vercel**: 100GB bandwidth/month, unlimited sites
+- **Next.js**: Open source, free to use
+
+Perfect for starting your eCommerce business with zero infrastructure costs!
+
+---
+
+🎉 **You're ready!** Start selling with zero monthly costs.
