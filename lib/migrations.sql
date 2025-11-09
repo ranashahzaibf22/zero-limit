@@ -160,14 +160,14 @@ CREATE TRIGGER update_promotions_updated_at BEFORE UPDATE ON promotions
 -- ============================================
 
 -- Admin user credentials:
--- Email: admin@zerolimit.com
+-- Email: admin@zerolimitapparel.com
 -- Password: shahzaib12
 -- Password hash generated with bcrypt (10 rounds)
 
 INSERT INTO users (name, email, password_hash, role)
 VALUES (
   'Admin User',
-  'admin@zerolimit.com',
+  'admin@zerolimitapparel.com',
   '$2b$10$bCDV3ttmcmRf1SEDLuMu6e29AOAaZ5I7BL0uAk8xyLhPBEHx8wUme',
   'admin'
 )
