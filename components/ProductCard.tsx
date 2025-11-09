@@ -92,17 +92,17 @@ export function ProductCard({ product, onAddToCart, showWishlist = true }: Produ
   };
 
   return (
-    <div className="group relative bg-white border border-gray-200 hover:border-black transition-all duration-200">
+    <div className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 card-hover border border-neutral-200">
       {/* Wishlist Button */}
       {showWishlist && session && (
         <button
           onClick={toggleWishlist}
           disabled={isTogglingWishlist}
-          className="absolute top-4 right-4 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all"
           title={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <svg
-            className={`w-5 h-5 ${isInWishlist ? 'text-red-600 fill-current' : 'text-gray-600'}`}
+            className={`w-5 h-5 ${isInWishlist ? 'text-red-500 fill-current' : 'text-neutral-600'}`}
             fill={isInWishlist ? 'currentColor' : 'none'}
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -118,56 +118,60 @@ export function ProductCard({ product, onAddToCart, showWishlist = true }: Produ
       )}
 
       <Link href={`/products/${product.id}`}>
-        <div className="aspect-square relative overflow-hidden bg-gray-100">
+        <div className="aspect-square relative overflow-hidden bg-neutral-100">
           <Image
             src={primaryImage}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-cover group-hover:scale-110 transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           {product.stock <= 0 && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">OUT OF STOCK</span>
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+              <span className="text-white font-bold text-lg px-4 py-2 bg-red-600 rounded-lg">OUT OF STOCK</span>
+            </div>
+          )}
+          {/* Category Badge */}
+          {product.category && (
+            <div className="absolute top-4 left-4 px-3 py-1 bg-emerald-600 text-white text-xs font-semibold rounded-full uppercase tracking-wide">
+              {product.category}
             </div>
           )}
         </div>
       </Link>
       
-      <div className="p-4">
+      <div className="p-6">
         <Link href={`/products/${product.id}`}>
-          <h3 className="font-semibold text-lg mb-1 hover:underline">
+          <h3 className="font-bold text-xl mb-2 hover:text-emerald-600 transition-colors text-neutral-900">
             {product.name}
           </h3>
         </Link>
         
-        <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+        <p className="text-neutral-600 text-sm mb-4 line-clamp-2 leading-relaxed">
           {product.description}
         </p>
         
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-xl font-bold">
-            ${product.price.toFixed(2)}
-          </span>
+        <div className="flex items-center justify-between mt-4">
+          <div>
+            <span className="text-2xl font-bold text-neutral-900">
+              ${product.price.toFixed(2)}
+            </span>
+            {product.stock > 0 && product.stock < 10 && (
+              <p className="text-xs text-orange-600 mt-1">Only {product.stock} left!</p>
+            )}
+          </div>
           
           {onAddToCart && product.stock > 0 && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => onAddToCart(product)}
+              className="border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white font-semibold px-4 py-2 rounded-lg transition-all"
             >
               Add to Cart
             </Button>
           )}
         </div>
-        
-        {product.category && (
-          <div className="mt-2">
-            <span className="text-xs text-gray-500 uppercase tracking-wide">
-              {product.category}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );

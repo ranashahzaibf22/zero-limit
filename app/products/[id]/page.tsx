@@ -45,6 +45,11 @@ export default function ProductDetailPage() {
     setIsLoading(true);
 
     try {
+      // Check if supabase is properly configured
+      if (!supabase) {
+        throw new Error('Database connection not configured');
+      }
+
       const { data, error } = await supabase
         .from('products')
         .select(`
@@ -65,7 +70,9 @@ export default function ProductDetailPage() {
       }
     } catch (err) {
       console.error('Error fetching product:', err);
-      toast.error('Failed to load product');
+      toast.error('Failed to load product. Please check your connection.');
+      // Set product to null to show error message
+      setProduct(null);
     } finally {
       setIsLoading(false);
     }

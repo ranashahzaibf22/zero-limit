@@ -27,61 +27,68 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <nav className="container mx-auto px-4 py-4">
+    <header className="bg-white border-b border-neutral-200 sticky top-0 z-50 shadow-sm backdrop-blur-sm bg-white/95">
+      <nav className="container mx-auto px-4 lg:px-8 py-5">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-bold tracking-tight">
-            ZeroLimitApparel
+          <Link href="/" className="text-2xl lg:text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity">
+            <span className="bg-gradient-to-r from-neutral-900 to-neutral-700 bg-clip-text text-transparent">
+              ZeroLimit
+            </span>
+            <span className="text-emerald-600">Apparel</span>
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/products" className="hover:underline">
+          <div className="hidden md:flex items-center space-x-8 lg:space-x-10">
+            <Link href="/products" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
               Shop
             </Link>
-            <Link href="/products?category=Classic" className="hover:underline">
+            <Link href="/products?category=Classic" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
               Classic
             </Link>
-            <Link href="/products?category=Custom" className="hover:underline">
+            <Link href="/products?category=Custom" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
               Custom
             </Link>
-            <Link href="/products?category=Gen-Z" className="hover:underline">
+            <Link href="/products?category=Gen-Z" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
               Gen-Z
             </Link>
-            <Link href="/about" className="hover:underline">
+            <Link href="/about" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
               About
             </Link>
           </div>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-5 lg:space-x-6">
             {session ? (
               <>
-                <Link href="/wishlist" className="hover:underline hidden md:block">
-                  Wishlist
+                <Link href="/wishlist" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors hidden md:block">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
                 </Link>
-                <Link href="/account" className="hover:underline">
-                  Account
+                <Link href="/account" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
                 </Link>
                 {(session.user as any)?.role === 'admin' && (
-                  <Link href="/admin" className="hover:underline">
+                  <Link href="/admin" className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors">
                     Admin
                   </Link>
                 )}
                 <button
                   onClick={() => signOut()}
-                  className="hover:underline"
+                  className="text-neutral-700 hover:text-red-600 font-medium transition-colors hidden md:block"
                 >
                   Sign Out
                 </button>
               </>
             ) : (
               <>
-                <Link href="/auth/signin" className="hover:underline">
+                <Link href="/auth/signin" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
                   Sign In
                 </Link>
-                <Link href="/auth/signup" className="hover:underline hidden md:inline">
+                <Link href="/auth/signup" className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors hidden md:inline-block">
                   Sign Up
                 </Link>
               </>
@@ -90,7 +97,7 @@ export function Header() {
             {/* Search Icon */}
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="hover:underline"
+              className="text-neutral-700 hover:text-emerald-600 transition-colors"
               aria-label="Search"
             >
               <svg
@@ -109,7 +116,7 @@ export function Header() {
             </button>
 
             {/* Cart Icon */}
-            <Link href="/cart" className="relative">
+            <Link href="/cart" className="relative text-neutral-700 hover:text-emerald-600 transition-colors">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -124,7 +131,7 @@ export function Header() {
                 />
               </svg>
               {itemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-emerald-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {itemCount}
                 </span>
               )}
@@ -134,7 +141,7 @@ export function Header() {
 
         {/* Search Bar (Expandable) */}
         {isSearchOpen && (
-          <div className="mt-4 pb-4">
+          <div className="mt-4 pb-2 animate-in slide-in-from-top">
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
               <div className="relative">
                 <input
@@ -142,15 +149,15 @@ export function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products..."
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full px-5 py-3.5 pr-12 border-2 border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all"
                   autoFocus
                 />
                 <button
                   type="submit"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-600 hover:text-emerald-600 transition-colors"
                 >
                   <svg
-                    className="w-5 h-5 text-gray-600"
+                    className="w-6 h-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -169,20 +176,20 @@ export function Header() {
         )}
 
         {/* Mobile Navigation */}
-        <div className="md:hidden mt-4 flex space-x-4 text-sm">
-          <Link href="/products" className="hover:underline">
+        <div className="md:hidden mt-4 flex flex-wrap gap-4 text-sm">
+          <Link href="/products" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
             Shop
           </Link>
-          <Link href="/products?category=Classic" className="hover:underline">
+          <Link href="/products?category=Classic" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
             Classic
           </Link>
-          <Link href="/products?category=Custom" className="hover:underline">
+          <Link href="/products?category=Custom" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
             Custom
           </Link>
-          <Link href="/products?category=Gen-Z" className="hover:underline">
+          <Link href="/products?category=Gen-Z" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
             Gen-Z
           </Link>
-          <Link href="/about" className="hover:underline">
+          <Link href="/about" className="text-neutral-700 hover:text-emerald-600 font-medium transition-colors">
             About
           </Link>
         </div>

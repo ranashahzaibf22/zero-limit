@@ -35,21 +35,38 @@ export default function AdminDashboardPage() {
     setIsLoading(true);
 
     try {
+      // Check if supabase is configured
+      if (!supabase) {
+        throw new Error('Database connection not configured');
+      }
+
       // Fetch orders
-      const { data: orders } = await supabase
+      const { data: orders, error: ordersError } = await supabase
         .from('orders')
         .select('*')
         .order('created_at', { ascending: false });
 
+      if (ordersError) {
+        console.error('Orders error:', ordersError);
+      }
+
       // Fetch products
-      const { data: products } = await supabase
+      const { data: products, error: productsError } = await supabase
         .from('products')
         .select('id');
 
+      if (productsError) {
+        console.error('Products error:', productsError);
+      }
+
       // Fetch users
-      const { data: users } = await supabase
+      const { data: users, error: usersError } = await supabase
         .from('users')
         .select('id');
+
+      if (usersError) {
+        console.error('Users error:', usersError);
+      }
 
       // Calculate stats
       const totalRevenue = orders?.reduce((sum, order) => sum + parseFloat(order.total), 0) || 0;
@@ -67,6 +84,15 @@ export default function AdminDashboardPage() {
       setRecentOrders(orders?.slice(0, 10) || []);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      // Set default values to prevent crashes
+      setStats({
+        totalRevenue: 0,
+        totalOrders: 0,
+        pendingOrders: 0,
+        totalProducts: 0,
+        totalCustomers: 0,
+      });
+      setRecentOrders([]);
     } finally {
       setIsLoading(false);
     }

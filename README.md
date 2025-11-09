@@ -33,7 +33,7 @@ A production-ready Next.js 14+ eCommerce platform for selling premium hoodies, o
 - URL: `/admin` (redirects to `/admin/login`)
 - Login URL: `/admin/login`
 - Default Credentials:
-  - Email: `admin@zerolimit.com`
+  - Email: `admin@zerolimitapparel.com`
   - Password: `shahzaib12`
 - After login, admin users can access the admin panel via the header navigation
 
