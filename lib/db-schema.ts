@@ -64,8 +64,9 @@ CREATE TABLE IF NOT EXISTS orders (
   user_id UUID REFERENCES users(id),
   total DECIMAL(10, 2) NOT NULL,
   status VARCHAR(50) DEFAULT 'pending',
+  payment_type VARCHAR(50) DEFAULT 'cod', -- 'cod' or 'prebooking'
   payment_status VARCHAR(50) DEFAULT 'pending',
-  stripe_payment_intent_id VARCHAR(255),
+  contact_number VARCHAR(20), -- For pre-booking payments
   shipping_address JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

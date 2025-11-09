@@ -10,6 +10,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Product, ProductVariant } from '@/types';
 import { Button } from '@/components/Button';
+import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { useCartStore } from '@/lib/cart-store';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
@@ -210,6 +211,14 @@ export default function ProductDetailPage() {
           >
             {currentStock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </Button>
+
+          {/* WhatsApp Contact */}
+          <div className="mb-4">
+            <WhatsAppButton 
+              message={`Hi, I'm interested in ${product.name}`}
+              className="w-full"
+            />
+          </div>
 
           {/* Category */}
           {product.category && (

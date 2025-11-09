@@ -1,26 +1,22 @@
 /**
- * Checkout page with Stripe payment integration
+ * Checkout page with manual payment options (COD or Pre-booking)
  */
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/Button';
+import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { useCartStore } from '@/lib/cart-store';
 import toast from 'react-hot-toast';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
-function CheckoutForm() {
-  const stripe = useStripe();
-  const elements = useElements();
-  const router = useRouter();
+export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCartStore();
+  const router = useRouter();
   
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentType, setPaymentType] = useState<'cod' | 'prebooking'>('cod');
   const [formData, setFormData] = useState({
     email: '',
     name: '',
@@ -28,37 +24,54 @@ function CheckoutForm() {
     city: '',
     state: '',
     postalCode: '',
-    country: 'US',
+    country: 'Pakistan',
+    contactNumber: '',
   });
 
   const subtotal = getTotal();
   const shipping = 10;
   const total = subtotal + shipping;
 
+  // Redirect to cart if empty
+  React.useEffect(() => {
+    if (items.length === 0) {
+      router.push('/cart');
+    }
+  }, [items, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
-      const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
-          receipt_email: formData.email,
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          items,
+          total,
+          shippingAddress: {
+            street: formData.address,
+            city: formData.city,
+            state: formData.state,
+            postal_code: formData.postalCode,
+            country: formData.country,
+          },
+          paymentType,
+          contactNumber: paymentType === 'prebooking' ? formData.contactNumber : null,
+        }),
       });
 
-      if (error) {
-        toast.error(error.message || 'Payment failed');
-      } else {
-        // Payment successful
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message);
         clearCart();
         router.push('/checkout/success');
+      } else {
+        toast.error(data.error || 'Failed to place order');
       }
     } catch (err: any) {
       toast.error(err.message || 'An error occurred');
@@ -67,190 +80,9 @@ function CheckoutForm() {
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Contact Information */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
-            <input
-              type="email"
-              required
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Full Name</label>
-            <input
-              type="text"
-              required
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Shipping Address */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Address</label>
-            <input
-              type="text"
-              required
-              className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">City</label>
-              <input
-                type="text"
-                required
-                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">State</label>
-              <input
-                type="text"
-                required
-                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Postal Code</label>
-              <input
-                type="text"
-                required
-                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
-                value={formData.postalCode}
-                onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Country</label>
-              <input
-                type="text"
-                required
-                className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
-                value={formData.country}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Payment Element */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Payment Information</h3>
-        <PaymentElement />
-      </div>
-
-      {/* Submit Button */}
-      <Button
-        type="submit"
-        variant="primary"
-        size="lg"
-        className="w-full"
-        isLoading={isProcessing}
-        disabled={!stripe || isProcessing}
-      >
-        {isProcessing ? 'Processing...' : `Pay $${total.toFixed(2)}`}
-      </Button>
-    </form>
-  );
-}
-
-export default function CheckoutPage() {
-  const { items, getTotal } = useCartStore();
-  const router = useRouter();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const subtotal = getTotal();
-  const shipping = 10;
-  const total = subtotal + shipping;
-
-  useEffect(() => {
-    if (items.length === 0) {
-      router.push('/cart');
-      return;
-    }
-
-    // Create payment intent
-    fetch('/api/checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        items,
-        total,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setClientSecret(data.clientSecret);
-        } else {
-          toast.error('Failed to initialize checkout');
-        }
-      })
-      .catch((err) => {
-        console.error('Checkout error:', err);
-        toast.error('An error occurred');
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-        </div>
-      </div>
-    );
+  if (items.length === 0) {
+    return null;
   }
-
-  if (!clientSecret) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Unable to initialize checkout</h1>
-          <Button onClick={() => router.push('/cart')}>
-            Return to Cart
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const appearance = {
-    theme: 'stripe' as const,
-    variables: {
-      colorPrimary: '#000000',
-    },
-  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -258,9 +90,169 @@ export default function CheckoutPage() {
         {/* Checkout Form */}
         <div className="lg:col-span-2">
           <h1 className="text-4xl font-bold mb-8">Checkout</h1>
-          <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
-            <CheckoutForm />
-          </Elements>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Contact Information */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <input
+                    type="email"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Shipping Address */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Address</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">City</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">State/Province</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                      value={formData.state}
+                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Postal Code</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                      value={formData.postalCode}
+                      onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Country</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                      value={formData.country}
+                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Method */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
+              <div className="space-y-3">
+                <label className="flex items-center p-4 border border-gray-300 cursor-pointer hover:border-black transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentType"
+                    value="cod"
+                    checked={paymentType === 'cod'}
+                    onChange={(e) => setPaymentType('cod')}
+                    className="mr-3"
+                  />
+                  <div>
+                    <div className="font-medium">Cash on Delivery (COD)</div>
+                    <div className="text-sm text-gray-600">Pay when you receive your order</div>
+                  </div>
+                </label>
+
+                <label className="flex items-center p-4 border border-gray-300 cursor-pointer hover:border-black transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentType"
+                    value="prebooking"
+                    checked={paymentType === 'prebooking'}
+                    onChange={(e) => setPaymentType('prebooking')}
+                    className="mr-3"
+                  />
+                  <div>
+                    <div className="font-medium">Pre-booking</div>
+                    <div className="text-sm text-gray-600">We'll contact you for payment details</div>
+                  </div>
+                </label>
+              </div>
+
+              {/* Contact Number for Pre-booking */}
+              {paymentType === 'prebooking' && (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium mb-2">
+                    Contact Number (for payment confirmation)
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="+92XXXXXXXXXX"
+                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+                    value={formData.contactNumber}
+                    onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* WhatsApp Contact */}
+            <div className="bg-green-50 border border-green-200 p-4">
+              <p className="text-sm mb-3">Have questions? Contact us on WhatsApp!</p>
+              <WhatsAppButton 
+                message="Hi, I have a question about my order"
+                size="sm"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              className="w-full"
+              isLoading={isProcessing}
+            >
+              {isProcessing ? 'Processing...' : 'Place Order'}
+            </Button>
+          </form>
         </div>
 
         {/* Order Summary */}

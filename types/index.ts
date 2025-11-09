@@ -52,8 +52,9 @@ export interface Order {
   total: number;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   shipping_address?: Address;
-  payment_status?: 'pending' | 'paid' | 'failed' | 'refunded';
-  stripe_payment_intent_id?: string;
+  payment_type?: 'cod' | 'prebooking'; // Cash on Delivery or Pre-booking
+  payment_status?: 'pending' | 'paid' | 'failed';
+  contact_number?: string; // For pre-booking payments
   created_at: Date;
   updated_at?: Date;
   items?: OrderItem[];

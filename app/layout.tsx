@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { FloatingWhatsAppButton } from "@/components/WhatsAppButton";
 import { Providers } from "./providers";
 import { Toaster } from "react-hot-toast";
 
@@ -35,6 +36,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <FloatingWhatsAppButton />
           <Toaster position="bottom-right" />
         </Providers>
       </body>
