@@ -11,6 +11,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^5.3.0",
     "@stripe/stripe-js": "^8.3.0",
     "@supabase/supabase-js": "^2.80.0",
     "bcryptjs": "^3.0.3",

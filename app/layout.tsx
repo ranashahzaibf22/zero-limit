@@ -4,17 +4,11 @@
  */
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Providers } from "./providers";
 import { Toaster } from "react-hot-toast";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "ZeroLimitApparel - Premium Hoodies",
@@ -34,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased bg-white text-black min-h-screen flex flex-col`}>
+      <body className="antialiased bg-white text-black min-h-screen flex flex-col font-sans">
         <Providers>
           <Header />
           <main className="flex-grow">
