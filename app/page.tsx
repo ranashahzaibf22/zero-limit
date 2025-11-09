@@ -52,9 +52,9 @@ export default function HomePage() {
         <h2 className="text-4xl font-bold text-center mb-12">
           Featured Collections
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Classic Collection */}
-          <Link href="/products?category=Hoodies" className="group relative h-96 overflow-hidden border border-gray-200 hover:border-black transition-colors">
+          <Link href="/products?category=Classic" className="group relative h-96 overflow-hidden border border-gray-200 hover:border-black transition-colors">
             <div className="absolute inset-0 bg-black">
               <Image
                 src="/collection-classic.jpg"
@@ -64,25 +64,42 @@ export default function HomePage() {
               />
             </div>
             <div className="relative z-10 h-full flex flex-col justify-end p-8 text-white">
-              <h3 className="text-3xl font-bold mb-2">Classic Hoodies</h3>
+              <h3 className="text-3xl font-bold mb-2">Classic</h3>
               <p className="text-gray-200 mb-4">Timeless designs for everyday wear</p>
               <span className="text-sm underline">Shop Collection →</span>
             </div>
           </Link>
 
-          {/* Oversized Collection */}
-          <Link href="/products?category=Hoodies&style=oversized" className="group relative h-96 overflow-hidden border border-gray-200 hover:border-black transition-colors">
+          {/* Custom Collection */}
+          <Link href="/products?category=Custom" className="group relative h-96 overflow-hidden border border-gray-200 hover:border-black transition-colors">
             <div className="absolute inset-0 bg-black">
               <Image
-                src="/collection-oversized.jpg"
-                alt="Oversized Collection"
+                src="/collection-custom.jpg"
+                alt="Custom Collection"
                 fill
                 className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-500"
               />
             </div>
             <div className="relative z-10 h-full flex flex-col justify-end p-8 text-white">
-              <h3 className="text-3xl font-bold mb-2">Oversized Hoodies</h3>
-              <p className="text-gray-200 mb-4">Trendy oversized fit for ultimate comfort</p>
+              <h3 className="text-3xl font-bold mb-2">Custom</h3>
+              <p className="text-gray-200 mb-4">Personalized designs just for you</p>
+              <span className="text-sm underline">Shop Collection →</span>
+            </div>
+          </Link>
+
+          {/* Gen-Z Collection */}
+          <Link href="/products?category=Gen-Z" className="group relative h-96 overflow-hidden border border-gray-200 hover:border-black transition-colors">
+            <div className="absolute inset-0 bg-black">
+              <Image
+                src="/collection-genz.jpg"
+                alt="Gen-Z Collection"
+                fill
+                className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="relative z-10 h-full flex flex-col justify-end p-8 text-white">
+              <h3 className="text-3xl font-bold mb-2">Gen-Z</h3>
+              <p className="text-gray-200 mb-4">Trendy oversized fit for the modern generation</p>
               <span className="text-sm underline">Shop Collection →</span>
             </div>
           </Link>

@@ -210,7 +210,7 @@ export default function CheckoutPage() {
                   />
                   <div>
                     <div className="font-medium">Pre-booking</div>
-                    <div className="text-sm text-gray-600">We'll contact you for payment details</div>
+                    <div className="text-sm text-gray-600">We&apos;ll contact you for payment details</div>
                   </div>
                 </label>
               </div>

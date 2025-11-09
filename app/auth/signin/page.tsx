@@ -100,8 +100,8 @@ function SignInForm() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
+          <p className="text-center text-gray-600 mb-8">
+            Don&apos;t have an account?{' '}
             <Link href="/auth/signup" className="font-medium hover:underline">
               Sign Up
             </Link>

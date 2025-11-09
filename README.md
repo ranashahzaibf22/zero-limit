@@ -5,7 +5,7 @@ A production-ready Next.js 14+ eCommerce platform for selling premium hoodies, o
 ## 🚀 Features
 
 ### Customer Features
-- Homepage with hero section and featured collections
+- Homepage with hero section and featured collections (Classic / Custom / Gen-Z)
 - Product catalog with category filtering
 - Product detail pages with variants and image gallery
 - Shopping cart with persistent storage
@@ -15,10 +15,19 @@ A production-ready Next.js 14+ eCommerce platform for selling premium hoodies, o
 - **WhatsApp Support**: Direct contact buttons throughout the site
 
 ### Admin Features
-- Dashboard with sales overview
-- Product management (CRUD operations)
+- Dashboard with sales overview and analytics
+- Product management (CRUD operations) with Cloudinary image upload
 - Order management with status updates
-- Customer management
+- Customer management with order history
+- Analytics: Total orders, total revenue, pending orders
+- Protected admin panel (role-based access)
+
+**Admin Access:**
+- URL: `/admin` (redirects to `/admin/dashboard`)
+- Default Credentials:
+  - Email: `admin@zerolimitapparel.com`
+  - Password: `shahzaib12`
+- After login, admin users can access the admin panel via the header navigation
 
 ## 🛠️ Tech Stack (100% Free Tier)
 
@@ -42,8 +51,13 @@ npm install
 
 1. Create account at [supabase.com](https://supabase.com)
 2. Create new project
-3. Run SQL from `lib/db-schema.ts` in SQL Editor
+3. Run SQL from `lib/migrations.sql` in SQL Editor (creates all tables, admin user, and sample products)
 4. Get credentials from Settings > API
+
+**What the migration creates:**
+- All database tables (users, products, product_images, etc.)
+- Admin user: admin@zerolimitapparel.com / shahzaib12
+- 6 sample products across 3 categories (Classic, Custom, Gen-Z)
 
 ### 3. Set up Cloudinary (Free)
 
@@ -76,6 +90,18 @@ npm run dev
 ```
 
 Visit http://localhost:3000
+
+### 6. Access Admin Panel
+
+After setting up the database and creating the admin user (see step 2), you can:
+
+1. Navigate to http://localhost:3000/admin or click "Admin" in the header after logging in
+2. Login with admin credentials:
+   - Email: `admin@zerolimitapparel.com`
+   - Password: `shahzaib12`
+3. Manage products, orders, and customers from the admin dashboard
+
+**Note:** Run the SQL migration from `lib/migrations.sql` in your Supabase SQL Editor to create the admin user automatically.
 
 ## 💳 Payment Methods
 
@@ -116,10 +142,20 @@ See `lib/db-schema.ts` for complete schema.
 
 ## 📚 Documentation
 
-- `README.md` - This file
-- `QUICKSTART.md` - Quick setup guide
-- `docs/DEPLOYMENT.md` - Deployment guide
-- `docs/PROJECT_SUMMARY.md` - Project overview
+Full documentation available in the `docs/` directory:
+
+- **`README.md`** - This file (overview and quick start)
+- **`QUICKSTART.md`** - Fast 10-minute setup guide
+- **`docs/SETUP_GUIDE.md`** - Complete setup and navigation guide
+- **`docs/MANUAL_ORDER_FLOW.md`** - COD and pre-booking payment workflows
+- **`docs/DEPLOYMENT.md`** - Vercel deployment instructions
+- **`docs/PROJECT_SUMMARY.md`** - Detailed project architecture
+
+### Quick Links
+- Setup Instructions: `docs/SETUP_GUIDE.md`
+- Admin Panel Guide: `docs/SETUP_GUIDE.md#-admin-access`
+- Payment Flow: `docs/MANUAL_ORDER_FLOW.md`
+- Database Schema: `lib/migrations.sql`
 
 ## 🔐 Security
 

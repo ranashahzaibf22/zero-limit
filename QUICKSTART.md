@@ -13,12 +13,18 @@ npm install
 
 1. Create new project
 2. Go to SQL Editor
-3. Copy entire content from `lib/db-schema.ts`
-4. Paste and run in SQL Editor
+3. Copy entire content from `lib/migrations.sql`
+4. Paste and run in SQL Editor (this will create all tables AND the admin user)
 5. Go to Settings > API and copy:
    - Project URL
    - `anon` public key
    - `service_role` secret key
+
+**Admin User Created:**
+- Email: `admin@zerolimitapparel.com`
+- Password: `shahzaib12`
+
+The migration script automatically creates this admin user with the correct password hash.
 
 ### 3. Set Up Cloudinary (Free Tier)
 
@@ -64,24 +70,26 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ### 5. Create Admin User
 
-In Supabase SQL Editor:
+**Already done!** The migration script in step 2 automatically created an admin user with these credentials:
+
+- Email: `admin@zerolimitapparel.com`
+- Password: `shahzaib12`
+
+You can now login with these credentials at http://localhost:3000/auth/signin and access the admin panel at http://localhost:3000/admin.
+
+If you need to create additional admin users or change the password, you can run this SQL in Supabase SQL Editor:
 
 ```sql
--- Create admin user (password: admin123)
+-- Create another admin user
 INSERT INTO users (name, email, password_hash, role)
 VALUES (
-  'Admin User',
-  'admin@zerolimit.com',
-  '$2a$10$rXK0h3cHXlH8nWRXlKv7XeLhWx7Ej0CiGhPSk/KKH7KnqWJkz7Wj6',
+  'Your Name',
+  'your@email.com',
+  '$2b$10$...',  -- Generate hash using bcryptjs
   'admin'
 );
-```
 
-> **Note**: This hash is for "admin123". For production, generate your own hash using bcrypt.
-
-Or create via signup and update role:
-
-```sql
+-- Or promote existing user to admin
 UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
 ```
 
@@ -97,25 +105,27 @@ Open [http://localhost:3000](http://localhost:3000)
 
 - **Homepage**: http://localhost:3000
 - **Products**: http://localhost:3000/products
-- **Admin**: http://localhost:3000/admin (login with admin credentials)
+- **Admin Panel**: http://localhost:3000/admin
+  - Login: `admin@zerolimitapparel.com` / `shahzaib12`
 - **Sign Up**: http://localhost:3000/auth/signup
+- **Sign In**: http://localhost:3000/auth/signin
 
 ## 📝 Add Sample Products
 
-In Supabase SQL Editor:
+The migration script in step 2 already added sample products! You should see:
+- Classic Black Hoodie
+- Classic White Hoodie
+- Custom Print Hoodie
+- Gen-Z Black Hoodie
+- Gen-Z White Hoodie
+- Minimalist Zip Hoodie
 
-```sql
--- Add sample products
-INSERT INTO products (name, description, price, category, stock) VALUES
-  ('Classic Black Hoodie', 'Premium black hoodie with ZeroLimit branding', 59.99, 'Hoodies', 100),
-  ('Classic White Hoodie', 'Premium white hoodie with ZeroLimit branding', 59.99, 'Hoodies', 100),
-  ('Oversized Black Hoodie', 'Trendy oversized fit black hoodie', 69.99, 'Hoodies', 75);
+These products are organized in three categories:
+- **Classic**: Timeless designs
+- **Custom**: Personalized products
+- **Gen-Z**: Trendy oversized fits
 
--- Add sample images (replace with your Cloudinary URLs)
-INSERT INTO product_images (product_id, image_url, is_primary) 
-SELECT id, 'https://res.cloudinary.com/demo/image/upload/sample.jpg', true
-FROM products LIMIT 1;
-```
+You can manage these products or add more via the admin panel at http://localhost:3000/admin/products
 
 ## 🛍️ Test Checkout
 

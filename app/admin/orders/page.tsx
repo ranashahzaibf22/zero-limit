@@ -8,7 +8,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Order } from '@/types';
-import { Button } from '@/components/Button';
 import toast from 'react-hot-toast';
 
 export default function AdminOrdersPage() {

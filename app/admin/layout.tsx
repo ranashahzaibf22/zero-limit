@@ -47,16 +47,29 @@ export default function AdminLayout({
     { href: '/admin/customers', label: 'Customers' },
   ];
 
+  const handleSignOut = async () => {
+    const { signOut } = await import('next-auth/react');
+    await signOut({ callbackUrl: '/' });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Admin Header */}
       <div className="bg-black text-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Admin Panel</h1>
-            <Link href="/" className="text-sm hover:underline">
-              ← Back to Store
-            </Link>
+            <h1 className="text-2xl font-bold">Admin Panel - ZeroLimitApparel</h1>
+            <div className="flex items-center space-x-4">
+              <Link href="/" className="text-sm hover:underline">
+                ← Back to Store
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="text-sm bg-white text-black px-4 py-2 hover:bg-gray-200 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
