@@ -29,13 +29,18 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=Hoodies" className="text-gray-400 hover:text-white">
-                  Hoodies
+                <Link href="/products?category=Classic" className="text-gray-400 hover:text-white">
+                  Classic
                 </Link>
               </li>
               <li>
-                <Link href="/products?sort=new" className="text-gray-400 hover:text-white">
-                  New Arrivals
+                <Link href="/products?category=Custom" className="text-gray-400 hover:text-white">
+                  Custom
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=Gen-Z" className="text-gray-400 hover:text-white">
+                  Gen-Z
                 </Link>
               </li>
             </ul>
@@ -46,22 +51,22 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Customer Service</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/contact" className="text-gray-400 hover:text-white">
-                  Contact Us
+                <Link href="/help" className="text-gray-400 hover:text-white">
+                  Help & Support
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-gray-400 hover:text-white">
+                <Link href="/help#shipping" className="text-gray-400 hover:text-white">
                   Shipping Info
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="text-gray-400 hover:text-white">
+                <Link href="/help#returns" className="text-gray-400 hover:text-white">
                   Returns & Exchanges
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-gray-400 hover:text-white">
+                <Link href="/help#faq" className="text-gray-400 hover:text-white">
                   FAQ
                 </Link>
               </li>
