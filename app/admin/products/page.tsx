@@ -284,13 +284,17 @@ function ProductModal({
 
           <div>
             <label className="block text-sm font-medium mb-2">Category</label>
-            <input
-              type="text"
+            <select
               required
               className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            />
+            >
+              <option value="Classic">Classic</option>
+              <option value="Custom">Custom</option>
+              <option value="Gen-Z">Gen-Z</option>
+              <option value="Hoodies">Hoodies</option>
+            </select>
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">
